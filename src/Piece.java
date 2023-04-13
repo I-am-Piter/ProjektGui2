@@ -3,21 +3,14 @@ public abstract class Piece {
     int type_m;
     int x_m;
     int y_m;
-    int team_m;
+    Color team_m;
 
-    Piece(int type, int x, int y, int team){
+    Piece(int type, int x, int y, Color team){
         type_m = type;
         x_m = x;
         y_m = y;
         team_m = team;
     }
     abstract boolean viableMove(int x, int y, Piece[][] pieces);
-    boolean isMoveStillOnBoard(int x,int y, Piece[][] pieces){
-        if(x < pieces.length && x>=0 && y < pieces.length && y>=0){
-            return this.viableMove(x,y,pieces);
-        }
-        return false;
-    }
-
 
 }

@@ -1,5 +1,5 @@
 public class Bishop extends Piece{
-    Bishop(int x, int y, int team) {
+    Bishop(int x, int y, Color team) {
         super(4, x, y, team);
     }
 

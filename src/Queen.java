@@ -1,5 +1,5 @@
 public class Queen extends Piece{
-    Queen(int x, int y, int team) {
+    Queen(int x, int y, Color team) {
         super(2, x, y, team);
     }
 
@@ -24,7 +24,7 @@ public class Queen extends Piece{
                     }
                     return true;
                 }
-                if(x_m == 0 | y_m == 0){
+                if(x_m-x == 0 | y_m-y == 0){
                     int jumpX = ((x_m < x)?1:(x_m > x)?-1:0);
                     int jumpY = ((y_m < y)?1:(y_m > y)?-1:0);
                     int currX = x_m + jumpX;

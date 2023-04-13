@@ -1,5 +1,5 @@
 public class King extends Piece{
-    King(int x, int y, int team) {
+    King(int x, int y, Color team) {
         super(1, x, y, team);
     }
 

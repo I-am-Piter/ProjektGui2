@@ -1,5 +1,5 @@
 public class Rook extends Piece{
-    Rook(int x, int y, int team) {
+    Rook(int x, int y, Color team) {
         super(3, x, y, team);
     }
 
