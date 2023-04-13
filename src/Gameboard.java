@@ -106,9 +106,37 @@ public class Gameboard {
         }
         return false;
     }
-    boolean checkIfCheck(Piece[][] p1){
-
+    boolean checkIfCheck(Piece[][] p1,Color color){
+        int x = 0;
+        int y = 0;
+        for(Piece[] pp:p1){
+            for(Piece ppp:pp){
+                if(ppp != null) {
+                    if (ppp.team_m == color && ppp.type_m == 1) {
+                        x = ppp.x_m;
+                        y = ppp.y_m;
+                    }
+                }
+            }
+        }
+        for(Piece[] pp:p1){
+            for(Piece ppp:pp){
+                if(ppp != null) {
+                    if (ppp.team_m != color) {
+                        if (ppp.viableMove(x, y, p1)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
+//    boolean checkIfMate(Piece[][] p1,Color color){
+//        if(checkIfCheck(p1,color)){
+//
+//        }
+//    }
 
     public static void main(String[] args) {
         Color gracz = Color.WHITE;
@@ -117,11 +145,7 @@ public class Gameboard {
         Scanner scanner = new Scanner(System.in);
         boolean work = true;
         while(work){
-            try {
-                gameboard.showBoard();
-            }catch (NullPointerException npe){
-                System.out.println();
-            }
+            gameboard.showBoard();
             System.out.println("Wprowadź kordynaty figury którą chcesz się ruszyć (x,y)");
             String kordy = scanner.nextLine();
             int x1 = kordy.charAt(0)-48;
@@ -185,10 +209,12 @@ public class Gameboard {
             gameboard.pieces_m[y1][x1] = null;
             gameboard.pieces_m[y2][x2].x_m = x2;
             gameboard.pieces_m[y2][x2].y_m = y2;
-            gameboard.showBoard();
-            gameboard.checkIfCheck(gameboard.pieces_m);
             System.out.println("następny gracz");
             gracz = (gracz == Color.BLACK?Color.WHITE:Color.BLACK);
+            if(gameboard.checkIfCheck(gameboard.pieces_m,gracz)){
+                System.out.println("SZACH");
+            }
+
 
         }
 
