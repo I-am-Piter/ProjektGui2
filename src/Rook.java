@@ -7,7 +7,7 @@ public class Rook extends Piece{
     boolean viableMove(int x, int y, Piece[][] pieces) {
         if (!(x - this.x_m == 0 && y - this.y_m == 0)) {
             if (pieces[y][x] == null || pieces[y][x].team_m != this.team_m) {
-                if(x_m == 0 | y_m == 0){
+                if(x_m - x == 0 | y_m - y == 0){
                     int jumpX = ((x_m < x)?1:(x_m > x)?-1:0);
                     int jumpY = ((y_m < y)?1:(y_m > y)?-1:0);
                     int currX = x_m + jumpX;

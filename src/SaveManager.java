@@ -4,13 +4,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class SaveManager {
+    //TODO ALL
     String path_m;
     SaveManager(String path){
         path_m = path;
     }
 
     void saveGame(Piece[][] pieces){
-        //savePieces(piecesToArray(pieces));
+        //savePieces(piecesToArray(pieces)); TODO
     }
     void savePieces(Piece[] p1) throws IOException {
         File plik = new File(path_m);
