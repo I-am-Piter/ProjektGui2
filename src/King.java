@@ -1,4 +1,5 @@
 public class King extends Piece{
+    public boolean madeMove = false;
     King(int x, int y, Color team) {
         super(1, x, y, team);
     }

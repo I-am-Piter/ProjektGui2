@@ -1,3 +1,6 @@
 public enum Color {
-    BLACK,WHITE
+    BLACK(1),WHITE(0);
+
+    Color(int i) {
+    }
 }
