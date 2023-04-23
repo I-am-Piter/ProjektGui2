@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -38,6 +39,7 @@ public class Gameboard {
         for (int i = 1; i < pieces_m[7].length; i++) {
             pieces_m[7][i] = new Pawn(i, 7, Color.WHITE);
         }
+
     }
 
     void showBoard() {
@@ -166,8 +168,39 @@ public class Gameboard {
         }
         return copy;
     }
+    void openFromSave(String path) throws IOException {
+        SaveManager.path_m = path;
+        Piece[] piecesTmp = SaveManager.openSavedGame();
+        fillPiece2dArray(piecesTmp);
+        fillZbitePionki(piecesTmp);
+    }
 
-    boolean checkIfMate(Piece[][] p1, Color color) {
+    private void fillZbitePionki(Piece[] piecesTmp) {
+        zbitePionki = new ArrayList<>();
+        for (Piece p:
+             piecesTmp) {
+            if(p.x_m == 0 && p.y_m == 0){
+                zbitePionki.add(p);
+            }
+        }
+    }
+
+    private void fillPiece2dArray(Piece[] piecesTmp) {
+        int pieces_mLength  = pieces_m.length;
+        pieces_m = new Piece[pieces_mLength][pieces_mLength];
+        for (int i = 1; i < pieces_m.length; i++) {
+            for (int j = 1; j < pieces_m[0].length; j++) {
+                for (Piece p:
+                     piecesTmp) {
+                    if(p.x_m == j && p.y_m == i){
+                        pieces_m[i][j] = p;
+                    }
+                }
+            }
+        }
+    }
+
+    boolean checkIfMate(Piece[][] p1, Color color) { //Działa średnio TODO
         Piece[][] p1Copy = makeCopy(p1);
         if (checkIfCheck(p1, color)) {
             for (int i = 1; i < p1.length; i++) {
@@ -182,7 +215,6 @@ public class Gameboard {
                                     p1[k][l].y_m = k;
 
                                     if (!checkIfCheck(p1, color)) {
-                                        System.out.println(j + " " + i + " " + l + " " + k);
                                         p1 = makeCopy(p1Copy);
                                         return false;
                                     }else {
@@ -204,11 +236,63 @@ public class Gameboard {
     }
 
 
-//    boolean bicieWPrzelocie(Piece[][] p1,int x1){ TODO
-//        if(checkIfAnyCanditates(p1)){
-//
-//        }
-//    }
+    boolean bicieWPrzelocie(Piece[][] p1,int x,int y1, int y2, Color team){
+        Piece kandydat = null;
+        if(checkIfAnyCanditates(p1)){
+            if((y1 == 2||y1 == 7)&&(y2 == 4||y2 == 5)){
+                for (Piece p:p1[y2]){
+                    if(p != null) {
+                        if (Math.abs(p.x_m - x) == 1 && p.team_m != team) {
+                            kandydat = p;
+                            System.out.println("Zbić w przelocie? (" + p.x_m + ") TAK/NIE");
+                            Scanner scanner = new Scanner(System.in);
+                            if (scanner.nextLine().equals("TAK")) {
+                                pieces_m[y2][x].x_m = 0;
+                                pieces_m[y2][x].y_m = 0;
+                                pieces_m[y2][x] = null;
+                                if(y1 == 7) {
+                                    pieces_m[6][x] = kandydat;
+                                    pieces_m[kandydat.y_m][kandydat.x_m] = null;
+                                    kandydat.x_m = x;
+                                    kandydat.y_m = 6;
+                                } else {
+                                    pieces_m[3][x] = kandydat;
+                                    pieces_m[kandydat.y_m][kandydat.x_m] = null;
+                                    kandydat.x_m = x;
+                                    kandydat.y_m = 3;
+                                }
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkIfAnyCanditates(Piece[][] p1) {
+        for (Piece p:p1[4]
+             ) {
+            if(p != null) {
+                if (p.type_m == 0 && p.team_m == Color.WHITE) {
+                    return true;
+                }
+            }
+        }
+        for (Piece p:p1[5]
+        ) {
+            if(p != null) {
+                if (p.type_m == 0 && p.team_m == Color.BLACK) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     boolean roszada(Color team, boolean ls) {
         switch (team) {
             case BLACK -> {
@@ -295,7 +379,6 @@ public class Gameboard {
         zbicie(x, y);
         pieces_m[y][x] = createPiece(kategoria, x, y, color);
     }
-
     Piece createPiece(int category, int x, int y, Color color) {
         switch (category) {
             case 2 -> {
@@ -314,17 +397,6 @@ public class Gameboard {
         return null;
     }
 
-    boolean checkIfPoddanie() {
-        Scanner scanner = new Scanner(System.in);
-        if (scanner.nextLine().equals("SURRENDER")) {
-            return true;
-        }
-        return false;
-    }
-
-    //    boolean checkIfSave{ TODO
-//
-//    }
     void zbicie(int x, int y) {
         pieces_m[y][x].x_m = 0;
         pieces_m[y][x].y_m = 0;
@@ -367,8 +439,12 @@ public class Gameboard {
                     continue;
                 }
             }
-            //TODO SAVE
-            //TODO READ
+            if(input.equals("SAVE")){
+                return new int[]{9,9,9,10};
+            }
+            if(input.equals("READ")){
+                return new int[]{9,9,9,11};
+            }
 
 
             if (input.length() == 4) {
@@ -379,18 +455,21 @@ public class Gameboard {
             } else {
                 error = true;
             }
-//            for (int i:
-//                 cords) {
-//                System.out.println(i);
-//            }
+            if(!isMoveLegal(pieces_m,team_t,cords[0],cords[1],cords[2],cords[3])){
+                System.out.println("move not legal");
+                error = true;
+            }
             if ((pieces_m[cords[3]][cords[2]] != null)) {
                 if (pieces_m[cords[3]][cords[2]].team_m == team_t) {
+                    System.out.println("piece null or not ur team");
                     error = true;
                 }
             }
             if ((!stillOnBoard(cords[0], cords[1], cords[2], cords[3])) || (pieces_m[cords[1]][cords[0]] == null) ||
                     (!pieces_m[cords[1]][cords[0]].viableMove(cords[2], cords[3], pieces_m)) ||
                     (pieces_m[cords[1]][cords[0]].team_m != team_t)) {
+                System.out.println("not on board or other");
+                System.out.println((pieces_m[cords[1]][cords[0]].team_m != team_t));
                 error = true;
             }
             if (error) {
@@ -403,6 +482,7 @@ public class Gameboard {
 
     public static void main(String[] args) {
         boolean[] poddanie = {false, false};
+        boolean nextRound = false;
         Color gracz = Color.WHITE;
         Gameboard gameboard = new Gameboard(8);
         gameboard.setGame();
@@ -411,30 +491,50 @@ public class Gameboard {
         int x1, y1, x2, y2;
         int[] move = new int[0];
         Piece[][] copy = new Piece[gameboard.pieces_m.length][gameboard.pieces_m[0].length];
-        SaveManager saveManager = new SaveManager("zapis.txt");
-        saveManager.saveGame(gameboard.pieces_m);
+        String path = "zapis.bin";
+        SaveManager saveManager = new SaveManager(path);
         while (work) {
             gameboard.showBoard();
             move = gameboard.getMove(gracz);
             final int[] surrender = {9, 9, 9, 9};
-            final int[] gameSave = {9, 9, 9, 10}; //TODO use
-            final int[] readSave = {9, 9, 9, 11}; //TODO use
+            final int[] gameSave = {9, 9, 9, 10};
+            final int[] readSave = {9, 9, 9, 11};
             final int[] changePlayer = {10, 10, 10, 10};
 
             if (Arrays.equals(changePlayer, move)) {
                 gracz = (gracz == Color.BLACK ? Color.WHITE : Color.BLACK);
+                System.out.println("changeplayer");
                 continue;
             }
             if (Arrays.equals(surrender, move)) {
-                poddanie[gracz.ordinal()] = true;
-                if (poddanie[0] == true && poddanie[1] == true) {
+                poddanie[gracz.getNum()] = true;
+                if (poddanie[0] == true && poddanie[1] == true && nextRound) {
                     work = false;
                     System.out.println("Gra została poddana");
                 }
                 gracz = (gracz == Color.BLACK ? Color.WHITE : Color.BLACK);
                 continue;
+            }else{
+                nextRound = false;
             }
-            //TODO OBSLUGA KODOW
+            if(Arrays.equals(gameSave,move)){
+                try {
+                    saveManager.saveGame(gameboard.pieces_m);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println("Game saved");
+                continue;
+            }
+            if(Arrays.equals(readSave,move)){
+                try {
+                    gameboard.openFromSave(path);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println("Starting game from file");
+                continue;
+            }
             x1 = move[0];
             y1 = move[1];
             x2 = move[2];
@@ -442,12 +542,14 @@ public class Gameboard {
             gameboard.pieces_m[y1][x1].madeMove_m = true;
             if (gameboard.pieces_m[y2][x2] != null) {
                 gameboard.zbicie(x2, y2);
-                System.out.println("zbicie");
             }
             gameboard.pieces_m[y2][x2] = gameboard.pieces_m[y1][x1];
             gameboard.pieces_m[y1][x1] = null;
             gameboard.pieces_m[y2][x2].x_m = x2;
             gameboard.pieces_m[y2][x2].y_m = y2;
+            if (gameboard.bicieWPrzelocie(gameboard.pieces_m, x1,y1,y2,gracz)){
+                continue;
+            }
             if (gameboard.pieces_m[y2][x2].type_m == 0 && (y2 == 8 || y2 == 1)) {
                 gameboard.promocjaPiona(x2, y2, gracz);
             }
@@ -459,7 +561,7 @@ public class Gameboard {
                 copy2 = makeCopy(gameboard.makeCopy(gameboard.pieces_m));
 
                 if (gameboard.checkIfMate(copy2, gracz)) {
-                    System.out.println("MAAAAAAAT");
+                    System.out.println("MAT");
                 }
             }
 

@@ -13,5 +13,8 @@ public abstract class Piece {
         madeMove_m = false;
     }
     abstract boolean viableMove(int x, int y, Piece[][] pieces);
+    public String toString(){
+        return "pionek o typie " + type_m + " koloru " + team_m + " na " + x_m + " " + y_m;
+    }
 
 }
