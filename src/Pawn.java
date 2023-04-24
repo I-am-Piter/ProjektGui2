@@ -49,5 +49,4 @@ public class Pawn extends Piece{
         }
         return false;
     }
-    //TODO bicie w przelocie
 }

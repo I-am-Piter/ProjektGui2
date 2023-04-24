@@ -8,7 +8,7 @@ public class King extends Piece{
     boolean viableMove(int x, int y, Piece[][] pieces) {
         if(!(x-this.x_m == 0 && y-this.y_m == 0)) {
             if (pieces[y][x] == null || pieces[y][x].team_m != this.team_m) {
-                if (Math.abs(this.x_m - x) <=1 && Math.abs(this.y_m - y) <= 1) {
+                if (((Math.abs(this.x_m - x)) <= 1) && ((Math.abs(this.y_m - y)) <= 1)) {
                     return true;
                 }
             }

@@ -16,29 +16,29 @@ public class Gameboard {
     void setGame() {
         //Black
         pieces_m[1][1] = new Rook(1, 1, Color.BLACK);
-        pieces_m[1][8] = new Rook(8, 1, Color.BLACK);
-        pieces_m[1][2] = new Knight(2, 1, Color.BLACK);
-        pieces_m[1][7] = new Knight(7, 1, Color.BLACK);
-        pieces_m[1][3] = new Bishop(3, 1, Color.BLACK);
-        pieces_m[1][6] = new Bishop(6, 1, Color.BLACK);
+//        pieces_m[1][8] = new Rook(8, 1, Color.BLACK);
+//        pieces_m[1][2] = new Knight(2, 1, Color.BLACK);
+//        pieces_m[1][7] = new Knight(7, 1, Color.BLACK);
+//        pieces_m[1][3] = new Bishop(3, 1, Color.BLACK);
+//        pieces_m[1][6] = new Bishop(6, 1, Color.BLACK);
         pieces_m[1][4] = new Queen(4, 1, Color.BLACK);
-        pieces_m[1][5] = new King(5, 1, Color.BLACK);
-        for (int i = 1; i < pieces_m[2].length; i++) {
-            pieces_m[2][i] = new Pawn(i, 2, Color.BLACK);
-        }
+//        pieces_m[1][5] = new King(5, 1, Color.BLACK);
+//        for (int i = 1; i < pieces_m[2].length; i++) {
+//            pieces_m[2][i] = new Pawn(i, 2, Color.BLACK);
+//        }
 
 //        White
-        pieces_m[8][1] = new Rook(1, 8, Color.WHITE);
-        pieces_m[8][8] = new Rook(8, 8, Color.WHITE);
-        pieces_m[8][2] = new Knight(2, 8, Color.WHITE);
-        pieces_m[8][7] = new Knight(7, 8, Color.WHITE);
-        pieces_m[8][3] = new Bishop(3, 8, Color.WHITE);
-        pieces_m[8][6] = new Bishop(6, 8, Color.WHITE);
-        pieces_m[8][5] = new Queen(5, 8, Color.WHITE);
+//        pieces_m[8][1] = new Rook(1, 8, Color.WHITE);
+//        pieces_m[8][8] = new Rook(8, 8, Color.WHITE);
+//        pieces_m[8][2] = new Knight(2, 8, Color.WHITE);
+//        pieces_m[8][7] = new Knight(7, 8, Color.WHITE);
+//        pieces_m[8][3] = new Bishop(3, 8, Color.WHITE);
+//        pieces_m[8][6] = new Bishop(6, 8, Color.WHITE);
+//        pieces_m[8][5] = new Queen(5, 8, Color.WHITE);
         pieces_m[8][4] = new King(4, 8, Color.WHITE);
-        for (int i = 1; i < pieces_m[7].length; i++) {
-            pieces_m[7][i] = new Pawn(i, 7, Color.WHITE);
-        }
+//        for (int i = 1; i < pieces_m[7].length; i++) {
+//            pieces_m[7][i] = new Pawn(i, 7, Color.WHITE);
+//        }
 
     }
 
@@ -144,7 +144,7 @@ public class Gameboard {
         }
         return false;
     }
-    boolean isMoveLegal(Piece[][] p1, Color color, int x1, int y1, int x2,int y2){
+    public boolean isMoveLegal(Piece[][] p1, Color color, int x1, int y1, int x2,int y2){
         Piece[][] p2 = new Piece[p1.length][p1[0].length];
         for (int i = 0; i < p1.length; i++) {
             for (int j = 0; j < p1[i].length; j++) {
@@ -163,7 +163,9 @@ public class Gameboard {
         Piece[][] copy = new Piece[p1.length][p1[0].length];
         for (int i = 0; i < copy.length; i++) {
             for (int j = 0; j < copy[i].length; j++) {
-                copy[i][j] = p1[i][j];
+                if(p1[i][j] != null) {
+                    copy[i][j] = (Piece) p1[i][j].clone();
+                }
             }
         }
         return copy;
@@ -173,6 +175,9 @@ public class Gameboard {
         Piece[] piecesTmp = SaveManager.openSavedGame();
         fillPiece2dArray(piecesTmp);
         fillZbitePionki(piecesTmp);
+        if(checkIfMate(pieces_m,Color.BLACK) || checkIfMate(pieces_m,Color.WHITE)){
+            System.out.println("Wczytałeś zakończoną grę.");
+        }
     }
 
     private void fillZbitePionki(Piece[] piecesTmp) {
@@ -200,7 +205,7 @@ public class Gameboard {
         }
     }
 
-    boolean checkIfMate(Piece[][] p1, Color color) { //Działa średnio TODO
+    boolean checkIfMate(Piece[][] p1, Color color) {
         Piece[][] p1Copy = makeCopy(p1);
         if (checkIfCheck(p1, color)) {
             for (int i = 1; i < p1.length; i++) {
@@ -208,12 +213,11 @@ public class Gameboard {
                     for (int k = 1; k < p1.length; k++) {
                         for (int l = 1; l < p1[i].length; l++) {
                             if (p1[i][j] != null) {
-                                if (p1[i][j].team_m == color && p1[i][j].viableMove(l, k, p1)) {
+                                if (p1[i][j].team_m == color && p1[i][j].viableMove(l, k, p1) && isMoveLegal(p1,color,j,i,l,k)) {
                                     p1[k][l] = p1[i][j];
                                     p1[i][j] = null;
                                     p1[k][l].x_m = l;
                                     p1[k][l].y_m = k;
-
                                     if (!checkIfCheck(p1, color)) {
                                         p1 = makeCopy(p1Copy);
                                         return false;
@@ -469,7 +473,6 @@ public class Gameboard {
                     (!pieces_m[cords[1]][cords[0]].viableMove(cords[2], cords[3], pieces_m)) ||
                     (pieces_m[cords[1]][cords[0]].team_m != team_t)) {
                 System.out.println("not on board or other");
-                System.out.println((pieces_m[cords[1]][cords[0]].team_m != team_t));
                 error = true;
             }
             if (error) {
@@ -493,21 +496,29 @@ public class Gameboard {
         Piece[][] copy = new Piece[gameboard.pieces_m.length][gameboard.pieces_m[0].length];
         String path = "zapis.bin";
         SaveManager saveManager = new SaveManager(path);
+        final int[] surrender = {9, 9, 9, 9};
+        final int[] gameSave = {9, 9, 9, 10};
+        final int[] readSave = {9, 9, 9, 11};
+        final int[] changePlayer = {10, 10, 10, 10};
+        Piece[][] copy2;
         while (work) {
             gameboard.showBoard();
+            copy2 = makeCopy(gameboard.makeCopy(gameboard.pieces_m));
+            if (gameboard.checkIfCheck(gameboard.pieces_m, gracz)) {
+                if (gameboard.checkIfMate(copy2, gracz)) {
+                    System.out.println("Gra została zakończona zwycięstwem: " + (gracz == Color.BLACK ? Color.WHITE : Color.BLACK));
+                    work = false;
+                    continue;
+                }
+            }
             move = gameboard.getMove(gracz);
-            final int[] surrender = {9, 9, 9, 9};
-            final int[] gameSave = {9, 9, 9, 10};
-            final int[] readSave = {9, 9, 9, 11};
-            final int[] changePlayer = {10, 10, 10, 10};
-
             if (Arrays.equals(changePlayer, move)) {
                 gracz = (gracz == Color.BLACK ? Color.WHITE : Color.BLACK);
-                System.out.println("changeplayer");
                 continue;
             }
             if (Arrays.equals(surrender, move)) {
                 poddanie[gracz.getNum()] = true;
+                nextRound = true;
                 if (poddanie[0] == true && poddanie[1] == true && nextRound) {
                     work = false;
                     System.out.println("Gra została poddana");
@@ -516,6 +527,8 @@ public class Gameboard {
                 continue;
             }else{
                 nextRound = false;
+                poddanie[0] = false;
+                poddanie[1] = false;
             }
             if(Arrays.equals(gameSave,move)){
                 try {
@@ -533,6 +546,7 @@ public class Gameboard {
                     throw new RuntimeException(e);
                 }
                 System.out.println("Starting game from file");
+                gracz = Color.WHITE;
                 continue;
             }
             x1 = move[0];
@@ -557,12 +571,6 @@ public class Gameboard {
             gracz = (gracz == Color.BLACK ? Color.WHITE : Color.BLACK);
             if (gameboard.checkIfCheck(gameboard.pieces_m, gracz)) {
                 System.out.println("SZACH");
-                Piece[][] copy2 = new Piece[gameboard.pieces_m.length][gameboard.pieces_m[0].length];
-                copy2 = makeCopy(gameboard.makeCopy(gameboard.pieces_m));
-
-                if (gameboard.checkIfMate(copy2, gracz)) {
-                    System.out.println("MAT");
-                }
             }
 
 
@@ -570,4 +578,5 @@ public class Gameboard {
 
     }
 }
+
 

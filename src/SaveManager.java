@@ -36,7 +36,7 @@ public class SaveManager {
         int tmp = 0;
         int index = 0;
         for (int i = 0; i < byteArray.length; i+=2) {
-            data = ((byteArray[i] & 0xFF) << 8) | (byteArray[i+1] & 0xFF);
+            data = ((byteArray[i]) << 8) | (byteArray[i+1] & 0xFF);
             team1 = (data>>11)&0b0001;
             y1 = (data>>7)&0b1111;
             x1 = (data>>3)&0b1111;

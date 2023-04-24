@@ -1,4 +1,4 @@
-public abstract class Piece {
+public abstract class Piece implements Cloneable{
     int type_m;
     int x_m;
     int y_m;
@@ -11,6 +11,14 @@ public abstract class Piece {
         y_m = y;
         team_m = team;
         madeMove_m = false;
+    }
+    @Override
+    public Object clone() {
+        try {
+            return (Piece) super.clone();
+        } catch (CloneNotSupportedException e) {
+        }
+        return null;
     }
     abstract boolean viableMove(int x, int y, Piece[][] pieces);
     public String toString(){
